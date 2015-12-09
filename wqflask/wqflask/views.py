@@ -133,7 +133,7 @@ def search_page():
         else:
             return render_template("data_sharing.html", **template_vars.__dict__)
     else:
-        key = "search_results:v3:" + json.dumps(request.args, sort_keys=True)
+        key = "search_results:v1:" + json.dumps(request.args, sort_keys=True)
         print("key is:", pf(key))
         with Bench("Loading cache"):
             result = Redis.get(key)
@@ -354,11 +354,12 @@ def marker_regression_page():
         if key in wanted or key.startswith(('value:')):
             start_vars[key] = value
 
-    version = "v1"
+    version = "v3"
     key = "marker_regression:{}:".format(version) + json.dumps(start_vars, sort_keys=True)
     print("key is:", pf(key))
     with Bench("Loading cache"):
-        result = Redis.get(key)
+        result = None # Just for testing
+        #result = Redis.get(key)
 
     #print("************************ Starting result *****************")
     #print("result is [{}]: {}".format(type(result), result))
@@ -377,14 +378,18 @@ def marker_regression_page():
                                            indent="   ")
 
         result = template_vars.__dict__
-        print("initial result:", result['qtl_results'])
+        #print("initial result:", result['qtl_results'])
 
-        for item in template_vars.__dict__.keys():
-            print("  ---**--- {}: {}".format(type(template_vars.__dict__[item]), item))
+        #for item in template_vars.__dict__.keys():
+        #    print("  ---**--- {}: {}".format(type(template_vars.__dict__[item]), item))
 
         #causeerror
         
-        gn1_template_vars = marker_regression_gn1.MarkerRegression(result)
+        #print("TESTING GN1!!!")
+        #gn1_template_vars = marker_regression_gn1.MarkerRegression(result).__dict__
+        #print("gn1_template_vars:", gn1_template_vars)
+        #causeerror
+
 
         #qtl_length = len(result['js_data']['qtl_results'])
         #print("qtl_length:", qtl_length)
