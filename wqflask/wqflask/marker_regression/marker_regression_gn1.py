@@ -172,9 +172,21 @@ class MarkerRegression(object):
 
         #helper_functions.get_species_dataset_trait(self, start_vars)
 
+        self.temp_uuid = start_vars['temp_uuid']
+
         self.dataset = start_vars['dataset']
         self.this_trait = start_vars['this_trait']
         self.species = start_vars['species']
+
+        #Needing for form submission when doing single chr mapping or remapping after changing options
+        self.vals = start_vars['vals'] 
+        self.mapping_method = start_vars['mapping_method'] 
+        if self.mapping_method == "rqtl_geno":
+            self.mapmethod_rqtl_geno = start_vars['method']
+            self.mapmodel_rqtl_geno = start_vars['model']
+            self.pair_scan = start_vars['pair_scan']
+
+        self.js_data = start_vars['js_data']
 
         #ZS: Think I can just get all this from dataset object now
         #RISet and Species
@@ -217,16 +229,21 @@ class MarkerRegression(object):
         #self.permChecked = fd.formdata.getvalue('permCheck', True)
         self.bootChecked = False #ZS: For now setting to False, I'll add this option later once rest of figure works
         #self.bootChecked = fd.formdata.getvalue('bootCheck', '')
+        if 'do_control' in start_vars.keys():
+            self.doControl = start_vars['do_control']
+        else:
+            self.doControl = "false"
         if 'control' in start_vars.keys():
             self.controlLocus = start_vars['control']
         else:
             self.controlLocus = ""
+        
         #self.controlLocus = fd.formdata.getvalue('controlLocus', '')
 
         #try:
-        #    self.selectedChr = int(fd.formdata.getvalue('chromosomes', "-1"))
+        self.selectedChr = int(start_vars['selected_chr'])
         #except:
-        self.selectedChr = -1
+        #    self.selectedChr = -1
 
         #whether include parents and F1 for InbredSet
         #fd.parentsf14regression = fd.formdata.getvalue('parentsf14regression')
@@ -271,6 +288,7 @@ class MarkerRegression(object):
         self.additiveChecked = False
         self.dominanceChecked = False
         self.LRS_LOD = start_vars['score_type']
+        self.cutoff = start_vars['cutoff']
         self.intervalAnalystChecked = False
         self.legendChecked = False
         self.geneChecked = False
@@ -508,28 +526,28 @@ class MarkerRegression(object):
         ################################################################
         # Plots goes here
         ################################################################
-        if self.plotScale != 'physic' or self.multipleInterval:
-            showLocusForm =  webqtlUtil.genRandStr("fm_")
-        else:
-            showLocusForm = ""
+        #if self.plotScale != 'physic' or self.multipleInterval:
+        #    showLocusForm =  webqtlUtil.genRandStr("fm_")
+        #else:
+        showLocusForm = ""
         intCanvas = pid.PILCanvas(size=(self.graphWidth,self.graphHeight))
-        gifmap = self.plotIntMapping(intCanvas, startMb = self.startMb, endMb = self.endMb, showLocusForm= showLocusForm)
-        print("AFTER PLOTINTMAPPING")        
+        gifmap = self.plotIntMapping(intCanvas, startMb = self.startMb, endMb = self.endMb, showLocusForm= showLocusForm)    
 
-        filename= webqtlUtil.genRandStr("Itvl_")
-        intCanvas.save(os.path.join(webqtlConfig.IMGDIR, filename), format='jpeg')
-        intImg=HT.Image('/image/'+filename+'.png', border=0, usemap='#WebQTLImageMap')
+        self.gifmap = gifmap.__str__()
+        #print("GIFMAP:", gifmap.__str__())
+
+        self.filename= webqtlUtil.genRandStr("Itvl_")
+        intCanvas.save(os.path.join(webqtlConfig.IMGDIR, self.filename), format='jpeg')
+        intImg=HT.Image('/image/'+self.filename+'.png', border=0, usemap='#WebQTLImageMap')
 
         #Scales plot differently for high resolution
         if self.draw2X:
             intCanvasX2 = pid.PILCanvas(size=(self.graphWidth*2,self.graphHeight*2))
             gifmapX2 = self.plotIntMapping(intCanvasX2, startMb = self.startMb, endMb = self.endMb, showLocusForm= showLocusForm, zoom=2)
-            intCanvasX2.save(os.path.join(webqtlConfig.IMGDIR, filename+"X2"), format='png')
-            #DLintImgX2=HT.Href(text='Download',url = '/image/'+filename+'X2.png', Class='smallsize', target='_blank')
-
-        print("AFTER GN1 PLOT")
+            intCanvasX2.save(os.path.join(webqtlConfig.IMGDIR, self.filename+"X2"), format='png')
+            #DLintImgX2=HT.Href(text='Download',url = '/image/'+self.filename+'X2.png', Class='smallsize', target='_blank')
  
-        textUrl = self.writeQTL2Text(fd, filename)
+        #textUrl = self.writeQTL2Text(fd, self.filename)
 
         ################################################################
         # Info tables goes here
@@ -571,13 +589,15 @@ class MarkerRegression(object):
         if (self.additiveChecked):
             btminfo.append(HT.BR(), 'A positive additive coefficient (', HT.Font('green', color='green'), ' line) indicates that %s alleles increase trait values. In contrast, a negative additive coefficient (' % fd.ppolar, HT.Font('red', color='red'), ' line) indicates that %s alleles increase trait values.' % fd.mpolar)
 
-        if self.traitList and self.traitList[0].db and self.traitList[0].db.type == 'Geno':
+        if self.traitList and self.traitList[0].dataset and self.traitList[0].dataset.type == 'Geno':
             btminfo.append(HT.BR(), 'Mapping using genotype data as a trait will result in infinity LRS at one locus. In order to display the result properly, all LRSs higher than 100 are capped at 100.')
 
         if self.permChecked and not self.multipleInterval and 0<self.nperm:
-            TD_LR = HT.TD(HT.Blockquote(topTable), HT.Blockquote(gifmap, showLocusForm, HT.P(), btminfo, HT.P(), perm_histogram, HT.P(), perm_text_file), bgColor='#eeeeee', height = 200)
+            TD_LR = HT.TD(HT.Blockquote(gifmap, showLocusForm, HT.P(), btminfo, HT.P(), perm_histogram, HT.P(), perm_text_file), bgColor='#eeeeee', height = 200)
+            #TD_LR = HT.TD(HT.Blockquote(topTable), HT.Blockquote(gifmap, showLocusForm, HT.P(), btminfo, HT.P(), perm_histogram, HT.P(), perm_text_file), bgColor='#eeeeee', height = 200)
         else:
-            TD_LR = HT.TD(HT.Blockquote(topTable), HT.Blockquote(gifmap, showLocusForm, HT.P(), btminfo), bgColor='#eeeeee', height = 200)
+            TD_LR = HT.TD(HT.Blockquote(gifmap, showLocusForm, HT.P(), btminfo), bgColor='#eeeeee', height = 200)
+            #TD_LR = HT.TD(HT.Blockquote(topTable), HT.Blockquote(gifmap, showLocusForm, HT.P(), btminfo, HT.P(), perm_histogram, HT.P(), perm_text_file), bgColor='#eeeeee', height = 200)
 
 
         if geneTable:
@@ -625,11 +645,11 @@ class MarkerRegression(object):
             # geneTableContainer
             TD_LR.append(HT.Blockquote(tableForm))
 
-        self.dict['body'] = TD_LR
-        self.dict['title'] = "Mapping"
+        self.body = TD_LR
+       
+        #self.dict['body'] = TD_LR
+        #self.dict['title'] = "Mapping"
 
-
-        print("AT END OF GN1 MAPPING")
 
     def writeQTL2Text(self, filename):
         if self.multipleInterval:
@@ -1749,6 +1769,7 @@ class MarkerRegression(object):
             lineColor = pid.lightblue
             startPosX = xLeftOffset
             for j, ChrInfo in enumerate(ChrAInfo):
+              if ChrInfo == self.selectedChr:
                 preLpos = -1
                 for i, item in enumerate(ChrInfo):
                     Lname,Lpos = item
@@ -1778,7 +1799,8 @@ class MarkerRegression(object):
                             edgeColor=rectColor,fillColor=rectColor,edgeWidth = 0)
                     COORDS="%d,%d,%d,%d"%(xLeftOffset+offsetA-LRectHeight, yZero+40+Zorder*(LRectWidth+3),\
                             xLeftOffset+offsetA,yZero+40+Zorder*(LRectWidth+3)+LRectWidth)
-                    HREF="javascript:showDatabase3('%s','%s','%s','');" % (showLocusForm,fd.RISet+"Geno", Lname)
+                    HREF="/show_trait?trait_id=%s&dataset=%s" % (Lname, self.dataset.group.name+"Geno")
+                    #HREF="javascript:showDatabase3('%s','%s','%s','');" % (showLocusForm,fd.RISet+"Geno", Lname)
                     Areas=HT.Area(shape='rect',coords=COORDS,href=HREF, title="Locus : " + Lname)
                     gifmap.areas.append(Areas)
                 ##piddle bug
@@ -1864,7 +1886,6 @@ class MarkerRegression(object):
 
         #"Significant" and "Suggestive" Drawing Routine
         # ======= Draw the thick lines for "Significant" and "Suggestive" =====  (crowell: I tried to make the SNPs draw over these lines, but piddle wouldn't have it...)
-        print("DRAW SUGGESTIVE/SIGNFICANT LINES")
         if self.permChecked and not self.multipleInterval:
             significantY = yZero - self.significance*LRSHeightThresh/LRSMax
             suggestiveY = yZero - self.suggestive*LRSHeightThresh/LRSMax
@@ -1903,40 +1924,64 @@ class MarkerRegression(object):
             
         if zoom == 2:
             lrsEdgeWidth = 2 * lrsEdgeWidth
-        print("DRAW QTL RESULT CURVE")
 
         LRSCoordXY = []
         AdditiveCoordXY = []
         DominanceCoordXY = []
 
         previous_chr = 1
-        previous_chr_as_int = 1
+        previous_chr_as_int = 0
+        oldStartPosX = 0
+        startPosX = xLeftOffset
         for i, qtlresult in enumerate(self.qtlresults):
             m = 0
-            startPosX = xLeftOffset
+            #startPosX = xLeftOffset
             thisLRSColor = self.colorCollection[0]
+
+            if qtlresult['chr'] != previous_chr and self.selectedChr == -1:
+                previous_chr = qtlresult['chr']
+                previous_chr_as_int += 1
+
+                newStartPosX = (self.ChrLengthDistList[previous_chr_as_int - 1]+self.GraphInterval)*plotXScale
+                if newStartPosX != oldStartPosX:
+                    startPosX += newStartPosX
+                    oldStartPosX = newStartPosX
+
+            #startPosX += (self.ChrLengthDistList[j]+self.GraphInterval)*plotXScale
+
             #for j, _chr in enumerate(self.genotype):
-            if 1 == 1:
+            if self.selectedChr == -1 or qtlresult['chr'] == self.selectedChr:
                 #LRSCoordXY = []
                 #AdditiveCoordXY = []
                 #DominanceCoordXY = []
                 #for k, _locus in enumerate(_chr):
                 if 1 == 1:
-                    if self.plotScale == 'physic':
+                    Xc = startPosX + (qtlresult['Mb']-startMb)*plotXScale
+                    #if self.plotScale == 'physic':
                         #Xc = startPosX + (_locus.Mb-startMb)*plotXScale
-                        Xc = startPosX + (qtlresult['Mb']-startMb)*plotXScale
-                    else:
+                        #Xc = startPosX + (qtlresult['Mb']-startMb)*plotXScale
+                    #else:
                         #Xc = startPosX + (_locus.cM-_chr[0].cM)*plotXScale
-                        Xc = startPosX + (qtlresult['cM']-qtlresult[0]['cM'])*plotXScale
+                        #Xc = startPosX + (qtlresult['cM']-qtlresult[0]['cM'])*plotXScale
 
                     # updated by NL 06-18-2011:
                     # fix the over limit LRS graph issue since genotype trait may give infinite LRS;
                     # for any lrs is over than 460(LRS max in this system), it will be reset to 460
-                    if qtlresult['lrs_value'] > 460 or qtlresult['lrs_value']=='inf':
-                    #if self.qtlresults[j]['lrs_value'] > 460 or self.qtlresults[j]['lrs_value']=='inf':
-                        Yc = yZero - webqtlConfig.MAXLRS*LRSHeightThresh/LRSMax
+                    if self.LRS_LOD == "LRS":
+                        if qtlresult['lrs_value'] > 460 or qtlresult['lrs_value']=='inf':
+                            Yc = yZero - webqtlConfig.MAXLRS*LRSHeightThresh/LRSMax
+                        else:
+                            Yc = yZero - qtlresult['lrs_value']*LRSHeightThresh/LRSMax
                     else:
-                        Yc = yZero - qtlresult['lrs_value']*LRSHeightThresh/LRSMax
+                        if qtlresult['lod_score'] > 100 or qtlresult['lod_score']=='inf':
+                            Yc = yZero - webqtlConfig.MAXLRS*LRSHeightThresh/LRSMax
+                        else:
+                            Yc = yZero - qtlresult['lod_score']*LRSHeightThresh/LRSMax
+                    #if qtlresult['lrs_value'] > 460 or qtlresult['lrs_value']=='inf':
+                    #if self.qtlresults[j]['lrs_value'] > 460 or self.qtlresults[j]['lrs_value']=='inf':
+                    #    Yc = yZero - webqtlConfig.MAXLRS*LRSHeightThresh/LRSMax
+                    #else:
+                    #    Yc = yZero - qtlresult['lrs_value']*LRSHeightThresh/LRSMax
 
                     LRSCoordXY.append((Xc, Yc))
                     #if not self.multipleInterval and self.additiveChecked:
@@ -2009,21 +2054,9 @@ class MarkerRegression(object):
                                     canvas.drawLine(Xc0, Yc0, Xc, Yc, color=plusColor, width=lineWidth, clipX=(xLeftOffset, xLeftOffset + plotWidth))
                                 else:
                                     canvas.drawLine(Xc0, yZero - (Yc0-yZero), Xc, yZero - (Yc-yZero), color=minusColor, width=lineWidth, clipX=(xLeftOffset, xLeftOffset + plotWidth))
-                 
-                print("previous_chr:", previous_chr_as_int)
-                startPosX +=  (self.ChrLengthDistList[previous_chr_as_int-1]+self.GraphInterval)*plotXScale
-                #startPosX +=  (self.ChrLengthDistList[j]+self.GraphInterval)*plotXScale
-
-                if qtlresult['chr'] != previous_chr:
-                    previous_chr = qtlresult['chr']
-                    try:
-                        previous_chr_as_int = int(previous_chr)
-                    except:
-                        previous_chr_as_int += 1
+                
 
         canvas.drawPolygon(LRSCoordXY,edgeColor=thisLRSColor,closed=0, edgeWidth=lrsEdgeWidth, clipX=(xLeftOffset, xLeftOffset + plotWidth))
-
-        print("AFTER QTL CURVE")
 
         ###draw additive scale
         if not self.multipleInterval and self.additiveChecked:
@@ -2115,7 +2148,7 @@ class MarkerRegression(object):
                 COORDS = "%d,%d,%d,%d" %(chrStartPix, yTopOffset, chrEndPix,yTopOffset +20)
 
                 #add by NL 09-03-2010
-                HREF = "javascript placeholder"
+                HREF = "javascript:chrView(%d,%s);" % (i,self.ChrLengthMbList)
                 #HREF = "javascript:changeView(%d,%s);" % (i,self.ChrLengthMbList)
                 Areas = HT.Area(shape='rect',coords=COORDS,href=HREF)
                 gifmap.areas.append(Areas)

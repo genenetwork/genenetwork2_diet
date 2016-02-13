@@ -43,7 +43,6 @@ from wqflask.show_trait import export_trait_data
 from wqflask.heatmap import heatmap
 from wqflask.marker_regression import marker_regression
 from wqflask.marker_regression import marker_regression_gn1
-from wqflask.interval_mapping import interval_mapping
 from wqflask.correlation import show_corr_results
 from wqflask.correlation_matrix import show_corr_matrix
 from wqflask.correlation import corr_scatter_plot
@@ -202,6 +201,11 @@ def references():
     doc = docs.Docs("references")
     return render_template("docs.html", **doc.__dict__)
 
+@app.route("/intro")
+def intro():
+    doc = docs.Docs("intro")
+    return render_template("docs.html", **doc.__dict__)
+
 @app.route("/policies")
 def policies():
     doc = docs.Docs("policies")
@@ -335,6 +339,7 @@ def marker_regression_page():
         'trait_id',
         'dataset',
         'method',
+        'selected_chr',
         'mapping_scale',
         'score_type',
         'suggestive',
@@ -382,14 +387,8 @@ def marker_regression_page():
 
         #for item in template_vars.__dict__.keys():
         #    print("  ---**--- {}: {}".format(type(template_vars.__dict__[item]), item))
-
-        #causeerror
         
-        print("TESTING GN1!!!")
         gn1_template_vars = marker_regression_gn1.MarkerRegression(result).__dict__
-        print("gn1_template_vars:", gn1_template_vars)
-        causeerror
-
 
         #qtl_length = len(result['js_data']['qtl_results'])
         #print("qtl_length:", qtl_length)
@@ -411,10 +410,11 @@ def marker_regression_page():
             result['pair_scan_array'] = bytesarray
             rendered_template = render_template("pair_scan_results.html", **result)
         else:
-            rendered_template = render_template("marker_regression.html", **result)
-            #rendered_template = render_template("marker_regression_gn1.html", **result)
+            #rendered_template = render_template("marker_regression.html", **result)
+            rendered_template = render_template("marker_regression_gn1.html", **gn1_template_vars)
 
     return rendered_template
+
 
 @app.route("/export", methods = ('POST',))
 def export():
@@ -437,60 +437,6 @@ def export_pdf():
     response = Response(pdf_file, mimetype="application/pdf")
     response.headers["Content-Disposition"] = "attachment; filename=%s"%filename
     return response
-
-@app.route("/interval_mapping", methods=('POST',))
-def interval_mapping_page():
-    initial_start_vars = request.form
-    temp_uuid = initial_start_vars['temp_uuid']
-    wanted = (
-        'trait_id',
-        'dataset',
-        'mapping_method',
-        'chromosome',
-        'num_perm',
-        'manhattan_plot',
-        'do_bootstraps',
-        'display_additive',
-        'default_control_locus',
-        'control_locus'
-    )
-
-    start_vars = {}
-    for key, value in initial_start_vars.iteritems():
-        if key in wanted or key.startswith(('value:')):
-            start_vars[key] = value
-
-    version = "v1"
-    key = "interval_mapping:{}:".format(version) + json.dumps(start_vars, sort_keys=True)
-    print("key is:", pf(key))
-    with Bench("Loading cache"):
-        result = Redis.get(key)
-
-    if result:
-        print("Cache hit!!!")
-        with Bench("Loading results"):
-            result = pickle.loads(result)
-    else:
-        print("Cache miss!!!")
-        template_vars = interval_mapping.IntervalMapping(start_vars, temp_uuid)
-
-        template_vars.js_data = json.dumps(template_vars.js_data,
-                                           default=json_default_handler,
-                                           indent="   ")
-
-        result = template_vars.__dict__
-        
-        for item in template_vars.__dict__.keys():
-            print("  ---**--- {}: {}".format(type(template_vars.__dict__[item]), item))
-        
-        #causeerror
-        Redis.set(key, pickle.dumps(result, pickle.HIGHEST_PROTOCOL))
-        Redis.expire(key, 60*60)
-
-    with Bench("Rendering template"):
-        rendered_template = render_template("marker_regression.html", **result)
-
-    return rendered_template
 
 @app.route("/corr_compute", methods=('POST',))
 def corr_compute_page():
@@ -523,10 +469,6 @@ def corr_scatter_plot_page():
                                        indent="   ")
     return render_template("corr_scatterplot.html", **template_vars.__dict__)
 
-#@app.route("/int_mapping", methods=('POST',))
-#def interval_mapping_page():
-#    template_vars = interval_mapping.IntervalMapping(request.args)
-#    return render_template("interval_mapping.html", **template_vars.__dict__)
 
 # Todo: Can we simplify this? -Sam
 def sharing_info_page():
