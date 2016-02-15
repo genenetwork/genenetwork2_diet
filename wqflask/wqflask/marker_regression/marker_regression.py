@@ -39,10 +39,16 @@ from utility import helper_functions
 from utility import Plot, Bunch
 from utility import temp_data
 from utility.benchmark import Bench
-from utility.tools import pylmm_command, plink_command
+from utility.tools import pylmm_command, plink_command, gemma_command
 
+# Check for valid binary paths of pylmm, plink, rqtl etc. This code
+# runs at startup, so a missing binary will balk before running the
+# service
+
+GEMMA_PATH,GEMMA_COMMAND = gemma_command()
 PYLMM_PATH,PYLMM_COMMAND = pylmm_command()
 PLINK_PATH,PLINK_COMMAND = plink_command()
+# RQTL_PATH,RQTL_COMMAND   = rqtl_command()
 
 class MarkerRegression(object):
 
