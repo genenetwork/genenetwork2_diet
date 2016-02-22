@@ -403,14 +403,14 @@ class DatasetGroup(object):
             print("  type: ", type(self.samplelist))
             print("  self.samplelist: ", self.samplelist)
         else:
-            print("Cache not hit")
+            print("Cache not hit for", self.name)
 
             from utility.tools import plink_command
-            PLINK_PATH,PLINK_COMMAND = plink_command()
+            PLINK_RUN = plink_command()
 
             geno_file_path = webqtlConfig.GENODIR+self.name+".geno"
+            @FIXME PJOTR/ZACH: .fam files should go into FLATFILES
             plink_file_path = PLINK_PATH+"/"+self.name+".fam"
-
             if os.path.isfile(plink_file_path):
                 self.samplelist = get_group_samplelists.get_samplelist("plink", plink_file_path)
             elif os.path.isfile(geno_file_path):

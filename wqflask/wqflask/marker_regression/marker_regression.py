@@ -45,9 +45,9 @@ from utility.tools import pylmm_command, plink_command, gemma_command
 # runs at startup, so a missing binary will balk before running the
 # service
 
-GEMMA_PATH,GEMMA_COMMAND = gemma_command()
-PYLMM_PATH,PYLMM_COMMAND = pylmm_command()
-PLINK_PATH,PLINK_COMMAND = plink_command()
+GEMMA_RUN = gemma_command()
+PYLMM_RUN = pylmm_command()
+PLINK_RUN = plink_command()
 # RQTL_PATH,RQTL_COMMAND   = rqtl_command()
 
 class MarkerRegression(object):
