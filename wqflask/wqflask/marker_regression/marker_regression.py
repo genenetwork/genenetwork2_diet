@@ -29,7 +29,7 @@ from flask import Flask, g
 from base.trait import GeneralTrait
 from base import data_set
 from base import species
-from base import webqtlConfig
+# from base import webqtlConfig
 from utility import webqtlUtil
 #from wqflask.marker_regression import qtl_reaper_mapping
 #from wqflask.marker_regression import plink_mapping

@@ -1,6 +1,14 @@
 #########################################'
 #      Environment Variables - public
+#
+# Note: much of this needs to handled by the settings/environment
+# scripts. But rather than migrating everything in one go, we'll
+# take it a step at a time. First the hard coded paths get replaced
+# with those in utility/tools.py
+# 
 #########################################
+
+from utility.tools import mk_dir, assert_dir, flat_files, TEMPDIR
 
 #Debug Level
 #1 for debug, mod python will reload import each time
@@ -48,30 +56,29 @@ UCSC_RUDI_TRACK_URL = " http://genome.cse.ucsc.edu/cgi-bin/hgTracks?org=%s&db=%s
 GENOMEBROWSER_URL="http://ucscbrowser.genenetwork.org/cgi-bin/hgTracks?clade=mammal&org=Mouse&db=mm9&position=%s&hgt.suggest=&pix=800&Submit=submit"
 ENSEMBLETRANSCRIPT_URL="http://useast.ensembl.org/Mus_musculus/Lucene/Details?species=Mus_musculus;idx=Transcript;end=1;q=%s"
 
+# HTMLPATH = GNROOT + 'genotype_files/'
+# PYLMM_PATH
+# SNP_PATH
+# IMGDIR = GNROOT + '/wqflask/wqflask/static/output/'
 
-GNROOT = "/home/zas1024/gene/" # Will remove this and dependent items later
-SECUREDIR = GNROOT + 'secure/'
-COMMON_LIB = GNROOT + 'support/admin'
-HTMLPATH = GNROOT + 'genotype_files/'
-PYLMM_PATH = '/home/zas1024/plink_gemma/'
-SNP_PATH = '/home/zas1024/snps/' 
-IMGDIR = GNROOT + '/wqflask/wqflask/static/output/'
-IMAGESPATH = HTMLPATH + 'images/'
-UPLOADPATH = IMAGESPATH + 'upload/'
-TMPDIR = '/home/zas1024/tmp/' # Will remove this and dependent items later
-GENODIR = HTMLPATH + 'genotypes/'
-NEWGENODIR = HTMLPATH + 'new_genotypes/'
-GENO_ARCHIVE_DIR = GENODIR + 'archive/'
-TEXTDIR = HTMLPATH + 'ProbeSetFreeze_DataMatrix/'
-CMDLINEDIR = HTMLPATH + 'webqtl/cmdLine/'
-ChangableHtmlPath = GNROOT + 'web/'
+TMPDIR               = mk_dir(TEMPDIR+'/gn2/')
+CACHEDIR             = mk_dir(TEMPDIR+'/cache/')
+GENERATED_IMAGE_DIR  = TMPDIR      # note we can not write into the git tree
 
-SITENAME = 'GN'
-PORTADDR = "http://50.16.251.170"
-BASEHREF = '<base href="http://50.16.251.170/">'
-INFOPAGEHREF = '/dbdoc/%s.html'
-GLOSSARYFILE = "/glossary.html"
+GENODIR              = flat_files('genotype')+'/'
+JSON_GENODIR         = assert_dir(GENODIR+'json/')
+
+# GENO_ARCHIVE_DIR = GENODIR + 'archive/'
+# TEXTDIR = HTMLPATH + 'ProbeSetFreeze_DataMatrix/'
+# CMDLINEDIR = HTMLPATH + 'webqtl/cmdLine/'
+# ChangableHtmlPath = GNROOT + 'web/'
+
+# SITENAME = 'GN'
+# PORTADDR = "http://50.16.251.170"
+# BASEHREF = '<base href="http://50.16.251.170/">'
+# INFOPAGEHREF = '/dbdoc/%s.html'
+# GLOSSARYFILE = "/glossary.html"
 CGIDIR = '/webqtl/' #XZ: The variable name 'CGIDIR' should be changed to 'PYTHONDIR'
 SCRIPTFILE = 'main.py'
-REFRESHSTR = '<meta http-equiv="refresh" content="5;url=%s' + SCRIPTFILE +'?sid=%s">'
-REFRESHDIR = '%s' + SCRIPTFILE +'?sid=%s'
+# REFRESHSTR = '<meta http-equiv="refresh" content="5;url=%s' + SCRIPTFILE +'?sid=%s">'
+# REFRESHDIR = '%s' + SCRIPTFILE +'?sid=%s'
