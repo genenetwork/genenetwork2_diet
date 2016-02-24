@@ -11,4 +11,3 @@ build/
 dist/
 *.egg-info/
 EGG-INFO/
-wqflask/output/*
