@@ -76,7 +76,7 @@ JSON_GENODIR         = assert_dir(GENODIR+'json/')
 # SITENAME = 'GN'
 # PORTADDR = "http://50.16.251.170"
 # BASEHREF = '<base href="http://50.16.251.170/">'
-# INFOPAGEHREF = '/dbdoc/%s.html'
+INFOPAGEHREF = '/dbdoc/%s.html'
 # GLOSSARYFILE = "/glossary.html"
 CGIDIR = '/webqtl/' #XZ: The variable name 'CGIDIR' should be changed to 'PYTHONDIR'
 SCRIPTFILE = 'main.py'
