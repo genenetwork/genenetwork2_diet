@@ -39,7 +39,8 @@ from utility import helper_functions
 from utility import Plot, Bunch
 from utility import temp_data
 from utility.benchmark import Bench
-from utility.tools import locate, PYLMM_COMMAND, GEMMA_COMMAND, PLINK_COMMAND
+from utility.tools import locate, locate_ignore_error, PYLMM_COMMAND, GEMMA_COMMAND, PLINK_COMMAND
+from utility.external import shell
 
 class MarkerRegression(object):
 
@@ -351,8 +352,8 @@ class MarkerRegression(object):
         write_cross     = ro.r["write.cross"]           # Map the write.cross function
         GENOtoCSVR      = ro.r["GENOtoCSVR"]            # Map the GENOtoCSVR function
 
-        genofilelocation  = webqtlConfig.HTMLPATH + "genotypes/" + self.dataset.group.name + ".geno"
-        crossfilelocation = webqtlConfig.HTMLPATH + "genotypes/" + self.dataset.group.name + ".cross"
+        genofilelocation  = locate(self.dataset.group.name + ".geno", "genotype")
+        crossfilelocation = locate(self.dataset.group.name + ".cross", "genotype")
 
         print("Conversion of geno to cross at location:", genofilelocation, " to ", crossfilelocation)
 
@@ -771,9 +772,7 @@ class MarkerRegression(object):
                 Redis.expire(key, 60*60)
     
                 command = PYLMM_COMMAND+' --key {} --species {}'.format(key,"other")
-    
-                os.system(command)
-    
+                shell(command)
                 
                 json_results = Redis.blpop("pylmm:results:" + temp_uuid, 45*60)
                 results = json.loads(json_results[1])
@@ -852,7 +851,7 @@ class MarkerRegression(object):
             print("command is:", command)
             print("after printing command")
 
-            os.system(command)
+            shell(command)
 
             #t_stats, p_values = lmm.run(key)
             #lmm.run(key)
