@@ -9,8 +9,10 @@ def run_gemma(this_dataset, samples, vals):
 
     gen_pheno_txt_file(this_dataset, samples, vals)
 
-    os.chdir("{}gemma".format(webqtlConfig.HTMLPATH))
+    # Don't do this!
+    # os.chdir("{}gemma".format(webqtlConfig.HTMLPATH))
 
+    # use GEMMA_RUN in the next one, create a unique temp file
     gemma_command = './gemma -bfile %s -k output_%s.cXX.txt -lmm 1 -o output/%s_output' % (this_dataset.group.name,
                                                                                     this_dataset.group.name,
                                                                                     this_dataset.group.name)
@@ -24,15 +26,15 @@ def run_gemma(this_dataset, samples, vals):
 
 def gen_pheno_txt_file(this_dataset, samples, vals):
     """Generates phenotype file for GEMMA"""
-                
-    with open("{}gemma/{}.fam".format(webqtlConfig.HTMLPATH, this_dataset.group.name), "w") as outfile:
+
+    with open("{}gemma/{}.fam".format(webqtlConfig.GENERATED_TEXT_DIR, this_dataset.group.name), "w") as outfile:
         for i, sample in enumerate(samples):
             outfile.write(str(sample) + " " + str(sample) + " 0 0 0 " + str(vals[i]) + "\n")
 
 def parse_gemma_output(this_dataset):
     included_markers = []
     p_values = []
-    with open("{}gemma/output/{}_output.assoc.txt".format(webqtlConfig.HTMLPATH, this_dataset.group.name)) as output_file:
+    with open("{}gemma/output/{}_output.assoc.txt".format(webqtlConfig.GENERATED_TEXT_DIR, this_dataset.group.name)) as output_file:
         for line in output_file:
             if line.startswith("chr"):
                 continue

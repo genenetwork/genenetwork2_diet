@@ -60,10 +60,14 @@ ENSEMBLETRANSCRIPT_URL="http://useast.ensembl.org/Mus_musculus/Lucene/Details?sp
 # PYLMM_PATH
 # IMGDIR = GNROOT + '/wqflask/wqflask/static/output/'
 
+# Temporary storage:
 TMPDIR               = mk_dir(TEMPDIR+'/gn2/')
 CACHEDIR             = mk_dir(TEMPDIR+'/cache/')
-GENERATED_IMAGE_DIR  = mk_dir(TMPDIR+'/generate/') # we can no longer write into the git tree
+# We can no longer write into the git tree:
+GENERATED_IMAGE_DIR  = mk_dir(TMPDIR+'/generate/')
+GENERATED_TEXT_DIR   = mk_dir(TMPDIR+'/generate_text/')
 
+# Flat file directories
 GENODIR              = flat_files('genotype')+'/'
 JSON_GENODIR         = assert_dir(GENODIR+'json/')
 
