@@ -1648,9 +1648,23 @@
                   "B6D2F2-PSUPublish",
                   "B6D2F2-PSU Published Phenotypes"
                ]
+            ],
+            "Phenotypes": [
+               [
+                  "None",
+                  "B6D2F2-PSUPublish",
+                  "B6D2F2-PSU Published Phenotypes"
+               ]
             ]
          },
          "B6D2RI": {
+            "Phenotypes": [
+               [
+                  "None",
+                  "B6D2RIPublish",
+                  "B6D2RI Published Phenotypes"
+               ]
+            ],
             "Phenotypes": [
                [
                   "None",
@@ -1758,6 +1772,13 @@
                   "167",
                   "UCLA_BHF2_LIVER_0605",
                   "UCLA BHF2 Liver (June05) mlratio"
+               ]
+            ],
+            "Phenotypes": [
+               [
+                  "None",
+                  "BHF2Publish",
+                  "BHF2 Published Phenotypes"
                ]
             ],
             "Phenotypes": [
@@ -2487,6 +2508,18 @@
                   "BIDMC/UTHSC Dev Neocortex P14 ILMv6.2 (Nov10) RankInv"
                ]
             ],
+            "Neutrophils mRNA": [
+               [
+                  "595",
+                  "UTHSC-Neut-1014",
+                  "UTHSC Elicited Peritoneal Neutrophils Affy MoGene 2.0 ST (Oct14) RMA **"
+               ],
+               [
+                  "596",
+                  "UTHSC-Neut_EL-1014",
+                  "UTHSC Elicited Peritoneal Neutrophils Affy MoGene 2.0 ST (Oct14) RMA Exon Level **"
+               ]
+            ],
             "Nucleus Accumbens mRNA": [
                [
                   "156",
@@ -3050,6 +3083,11 @@
                   "272",
                   "HC_M2_0606_MDP",
                   "Hippocampus Consortium M430v2 (Jun06) RMA MDP"
+               ],
+               [
+                  "594",
+                  "UFL-MDP-Hipp0814",
+                  "UFL MDP Hippocampus Antidepressant Affy Mouse 430 2.0 (Aug14) RMA **"
                ]
             ],
             "Liver mRNA": [
@@ -4420,6 +4458,10 @@
                "Neocortex mRNA"
             ],
             [
+               "Neutrophils mRNA",
+               "Neutrophils mRNA"
+            ],
+            [
                "Nucleus Accumbens mRNA",
                "Nucleus Accumbens mRNA"
             ],
@@ -4442,6 +4484,10 @@
             [
                "Striatum mRNA",
                "Striatum mRNA"
+            ],
+            [
+               "Subcutaneous WAT mRNA",
+               "Subcutaneous WAT mRNA"
             ],
             [
                "T Cell (helper) mRNA",
