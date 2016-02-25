@@ -63,22 +63,19 @@ ENSEMBLETRANSCRIPT_URL="http://useast.ensembl.org/Mus_musculus/Lucene/Details?sp
 
 TMPDIR               = mk_dir(TEMPDIR+'/gn2/')
 CACHEDIR             = mk_dir(TEMPDIR+'/cache/')
-GENERATED_IMAGE_DIR  = TMPDIR      # note we can not write into the git tree
+GENERATED_IMAGE_DIR  = mk_dir(TMPDIR+'/generate/') # we can no longer write into the git tree
 
 GENODIR              = flat_files('genotype')+'/'
 JSON_GENODIR         = assert_dir(GENODIR+'json/')
 
-# GENO_ARCHIVE_DIR = GENODIR + 'archive/'
-# TEXTDIR = HTMLPATH + 'ProbeSetFreeze_DataMatrix/'
-# CMDLINEDIR = HTMLPATH + 'webqtl/cmdLine/'
-# ChangableHtmlPath = GNROOT + 'web/'
-
 # SITENAME = 'GN'
 # PORTADDR = "http://50.16.251.170"
 # BASEHREF = '<base href="http://50.16.251.170/">'
+
 INFOPAGEHREF = '/dbdoc/%s.html'
-# GLOSSARYFILE = "/glossary.html"
 CGIDIR = '/webqtl/' #XZ: The variable name 'CGIDIR' should be changed to 'PYTHONDIR'
 SCRIPTFILE = 'main.py'
+
+# GLOSSARYFILE = "/glossary.html"
 # REFRESHSTR = '<meta http-equiv="refresh" content="5;url=%s' + SCRIPTFILE +'?sid=%s">'
 # REFRESHDIR = '%s' + SCRIPTFILE +'?sid=%s'
