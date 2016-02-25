@@ -58,7 +58,6 @@ ENSEMBLETRANSCRIPT_URL="http://useast.ensembl.org/Mus_musculus/Lucene/Details?sp
 
 # HTMLPATH = GNROOT + 'genotype_files/'
 # PYLMM_PATH
-# SNP_PATH
 # IMGDIR = GNROOT + '/wqflask/wqflask/static/output/'
 
 TMPDIR               = mk_dir(TEMPDIR+'/gn2/')

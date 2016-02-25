@@ -980,7 +980,11 @@ class MarkerRegression(object):
         return trimmed_genotype_data
     
 def create_snp_iterator_file(group):
-    plink_file_base = os.path.join(webqtlConfig.PYLMM_PATH, group)
+    """ 
+    This function is only called by main below
+    """
+    raise Exception("Paths are undefined here")
+    plink_file_base = os.path.join(webqtlConfig.TMPDIR, group)
     plink_input = input.plink(plink_file_base, type='b')
     
     data = dict(plink_input = list(plink_input),
@@ -996,11 +1000,6 @@ def create_snp_iterator_file(group):
     
     with gzip.open(snp_file_base, "wb") as fh:
         pickle.dump(data, fh, pickle.HIGHEST_PROTOCOL)
-
-#if __name__ == '__main__':
-#    import cPickle as pickle
-#    import gzip
-#    create_snp_iterator_file("HLC")
     
 if __name__ == '__main__':
     import cPickle as pickle
