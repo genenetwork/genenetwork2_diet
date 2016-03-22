@@ -4,5 +4,6 @@
 {% block content %} <!-- Start of body -->
 <div class="container">
   <h1>CTL Results</h1>
+  {{request.form['trait_list'].split(',')|length}} phenotypes as input
 </div>
 {% endblock %}
